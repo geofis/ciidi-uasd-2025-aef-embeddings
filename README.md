@@ -17,7 +17,7 @@ ORCID: [0000-0001-9924-0327](https://orcid.org/0000-0001-9924-0327)
 Enlace a la presentación de diapositivas:  
 <https://geofis.github.io/ciidi-uasd-2025-aef-embeddings/presentacion.html>
 
-Número de palabras en el resumen: 238
+Número de palabras en el resumen: 262
 
 ## Resumen
 
@@ -28,22 +28,24 @@ embeddings representan información condensada de series temporales de
 imágenes satelitales multiespectrales, facilitando tareas complejas como
 la clasificación de uso y cobertura del suelo, la predicción de
 distribución de especies y la planificación del muestreo en estudios
-ambientales, entre otros. El presente trabajo explora las
-potencialidades de este modelo generalista a partir de tres casos de
-aplicación en la República Dominicana. En primer lugar, se evaluó su
-capacidad para discriminar coberturas en zonas agrícolas, forestales y
-urbanas. En segundo lugar, se probó su utilidad para modelar la
-distribución espacial de especies a partir de registros de presencia
-obtenidos en GBIF, utilizando técnicas de aprendizaje supervisado y
-métricas de desempeño estándar. En tercer lugar, se analizó su
-aplicación en el diseño de muestreo estratificado, empleando la
-similitud entre embeddings para optimizar la representatividad espacial
-y ambiental. Los resultados muestran que los embeddings satelitales de
-AlphaEarth Foundations capturan patrones espaciales y temporales
-relevantes, permitiendo obtener clasificaciones robustas y predicciones
-consistentes con un costo computacional reducido. Se concluye que este
-recurso constituye una herramienta prometedora para investigadores y
+ambientales. El objetivo general de esta investigación es evaluar la
+utilidad práctica de los embeddings de AlphaEarth Foundations para
+apoyar diferentes procesos de análisis espacial en contextos ecológicos
+y territoriales de la República Dominicana. Para ello, el presente
+trabajo explora las potencialidades de este modelo generalista a partir
+de tres casos de aplicación. En primer lugar, se evaluó su capacidad
+para discriminar coberturas en zonas agrícolas, forestales y urbanas. En
+segundo lugar, se probó su desempeño en la modelación de la distribución
+espacial de especies empleando registros de presencia y técnicas de
+aprendizaje supervisado. En tercer lugar, se analizó su aplicación en el
+diseño de muestreo estratificado, utilizando la similitud entre
+embeddings para optimizar la representatividad espacial y ambiental. Los
+resultados muestran que los embeddings satelitales capturan patrones
+espaciales y temporales relevantes, permitiendo obtener clasificaciones
+robustas, predicciones consistentes y esquemas de muestreo más
+informados, con un costo computacional reducido. Se concluye que este
+recurso constituye una herramienta promisoria para investigadores y
 gestores ambientales, al ofrecer un punto de partida flexible y
 eficiente para desarrollar modelos adaptados a distintos contextos
-ecológicos y territoriales, fomentando el aprovechamiento de la
-inteligencia artificial en el monitoreo y gestión del territorio.
+ecológicos y territoriales, fortaleciendo el aprovechamiento de la
+inteligencia artificial en el monitoreo y la gestión del territorio.
