@@ -1,0 +1,300 @@
+---
+title: "Aplicaciones de los embeddings satelitales de Google AlphaEarth Foundations en el análisis geoespacial: clasificación de uso del suelo, modelado de distribución de especies y diseño de muestreo"
+subtitle: ""
+author: "José Ramón Martínez Batlle"
+institute: "Universidad Autónoma de Santo Domingo (UASD)"
+date: "Actualizado: `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    mathjax: "default"
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: large
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  fig.width = 12, 
+  fig.height = 8, 
+  fig.retina = 3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(ggrepel)
+```
+
+```{css, echo=FALSE}
+.title-slide {
+  background-image: url('fondo.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.title-slide .remark-slide-content {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+}
+
+.large { font-size: 150% }
+.medium { font-size: 130% }
+.small { font-size: 110% }
+.tiny { font-size: 80% }
+
+.green { color: #2E8B57; }
+.blue { color: #4169E1; }
+.red { color: #DC143C; }
+
+.highlight {
+  background-color: #ffff99;
+  padding: 2px 4px;
+}
+
+.box {
+  background-color: #f0f8ff;
+  border: 2px solid #4169E1;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 10px 0;
+}
+
+.equation {
+  background-color: #f5f5f5;
+  border-left: 5px solid #2E8B57;
+  padding: 15px;
+  margin: 10px 0;
+  font-family: 'Courier New', monospace;
+}
+```
+
+# .large[Objetivo]
+
+- Objetivo general: evaluar la utilidad práctica de los embeddings de AlphaEarth Foundations para apoyar diferentes procesos de análisis espacial en contextos ecológicos y territoriales de la República Dominicana. 
+
+- Objetivos específicos:
+  - Evaluar la capacidad para **discriminar coberturas** en zonas agrícolas, forestales y urbanas. 
+  - Probar su desempeño en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
+  - Analizar su aplicación en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
+
+---
+class: large
+
+## Objetivo 1  
+
+- Evaluar la capacidad de los embeddings satelitales de Google AEF para discriminar coberturas agrícolas, forestales y urbanas
+
+---
+class: large
+
+## Contexto
+
+Los embeddings satelitales de *Google AlphaEarth Foundations (AEF)* condensan información espacio–temporal derivada de series multiespectrales completas (p.ej., Sentinel-2).  
+Su principal fortaleza es que **permiten realizar tareas de clasificación con muy pocos datos de entrenamiento**, evitando el entrenamiento de modelos de deep learning desde cero.
+
+Para este objetivo se seleccionó un área con presencia simultánea de:
+
+- **Agroecosistemas**
+- **Bosque seco / matorral** (clases forestales/arbustivas)
+- **Humedales** (varias)
+- **Áreas urbanizadas**
+
+---
+class: large
+
+## Flujo metodológico general
+
+A continuación se muestra el resumen metodológico seguido para este objetivo, basado en tres componentes:
+
+1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno Jupyter adaptado de *Qiusheng Wu*.
+2. **Curación y unificación de clases** en QGIS.
+3. **Clasificación supervisada con embeddings AEF** mediante Random Forest y validación cruzada *k-folds* en Google Earth Engine.
+
+---
+class: large
+
+## Metodología
+
+```{r, warning=F, message=F, echo=F}
+library(magick)
+
+# Leer el PDF (puedes indicar página con [1], [2], etc.)
+pdf_img <- image_read_pdf("graphical-methodology.pdf",
+                          density = 300)  # density mejora resolución
+
+# Guardar como JPG
+image_write(pdf_img, path = "graphical-methodology.jpg", format = "jpg")
+```
+
+![](graphical-methodology.jpg)
+
+---
+class: large
+
+```{r}
+knitr::knit_exit()
+```
+
+
+## 1. Obtención de imágenes de alta resolución (ESRI World Imagery)
+
+Se descargó una imagen de referencia del área seleccionada empleando *ESRI World Imagery* con resolución aproximada de **5–10 m**, de manera que fuera coherente con la escala representada en los embeddings AEF.
+
+> **INSERTAR AQUÍ:**
+> `fig_imagen_esri_zoom14.png`
+> *(captura de la imagen que descargaste con el cuaderno SAM)*
+
+---
+
+## 2. Segmentación automática con Segment Anything (SAM)
+
+La segmentación se realizó usando el cuaderno:
+
+**automatic_mask_generator_usado_para_segmentar_imagen_sin_imagenes.ipynb**
+
+El procesamiento incluyó:
+
+* Uso del modelo **ViT-H** (SAM), adecuado para imágenes de ~10–20 m por su relación sensibilidad–costo computacional.
+* Aplicación de `sam.generate()` con `unique=True` para obtener **instancias diferenciadas**.
+* Ajuste de hiperparámetros (`points_per_side`, `pred_iou_thresh`, `crop_n_layers`, etc.) para aumentar la densidad de máscaras.
+
+> **INSERTAR AQUÍ:**
+> `fig_sam_masks_raw.png`
+> *(captura de las máscaras sin editar, producto directo del SAM)*
+
+---
+
+## 3. Limpieza y edición mínima en QGIS
+
+Las máscaras obtenidas se exportaron a GeoPackage, donde se realizó una edición mínima:
+
+* Corrección de pequeñas islas y polígonos erróneos.
+* Eliminación de duplicados.
+* Fusión de parches contiguos cuando correspondían a una misma cobertura.
+
+Se añadieron dos campos:
+
+* `class_id` (entero 1–8)
+* `class_label` (nombre de la clase)
+
+> **INSERTAR AQUÍ:**
+> `fig_masks_editadas_qgis.png`
+> *(captura del GPKG final con las clases)*
+
+---
+
+## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
+
+La clasificación se ejecutó en el cuaderno:
+
+**aef_classificacion.ipynb.ipynb**
+
+### Pasos principales
+
+* Se definió un **AOI** a partir del *buffer de 1 km* del socioecosistema.
+* Se extrajeron los embeddings mediante:
+
+```python
+emb_image = ee.Image("GOOGLE/AE/IMG_V1").clip(aoi)
+```
+
+* Se muestrearon los píxeles según los polígonos curados:
+
+```python
+sample = emb_image.sampleRegions(
+    collection=fc,
+    properties=["class_id"],
+    scale=40,   # ajustado para evitar EEException: memory exceeded
+    geometries=False
+)
+```
+
+* Se añadieron **5 folds** para validación cruzada:
+
+```python
+sample = sample.randomColumn("rand").divide(k).int()
+```
+
+* Se entrenó un clasificador:
+
+```python
+classifier = ee.Classifier.smileRandomForest(
+    numberOfTrees=100,
+    minLeafPopulation=5
+)
+```
+
+---
+
+## 5. Resultados de la validación cruzada (5-fold CV)
+
+Los resultados fueron evaluados en términos de:
+
+* **Exactitud global (OA)**
+* **Kappa de Cohen**
+* **Matriz de confusión por pliegue**
+
+> **INSERTAR AQUÍ:**
+> `tabla_resultados_cv.png`
+> *(captura de tus resultados generados en el cuaderno)*
+
+---
+
+## 6. Mapa de clasificación final
+
+El clasificador entrenado se aplicó al AOI completo para generar el mapa final.
+
+Visualización (paleta sugerida):
+
+```python
+vis_params = {
+    "min": 1, "max": 8,
+    "palette": [
+        "#ffffb2", "#238b45", "#41b6c4",
+        "#006d2c", "#2171b5", "#dd3497",
+        "#bdbdbd", "#8c6d31"
+    ]
+}
+```
+
+> **INSERTAR AQUÍ:**
+> `fig_clasificacion_final.png`
+> *(mapa de clasificación completo en geemap)*
+
+---
+
+## 7. Visualización directa de embeddings (RGB artificial)
+
+También se generó una visualización directa de tres dimensiones de embeddings:
+
+```python
+emb_vis_params = {
+    "bands": ["A00", "A21", "A42"],
+    "min": -2, "max": 2
+}
+```
+
+Esta imagen permite apreciar cómo los embeddings representan patrones espacio–temporales de cobertura, aun antes de la clasificación supervisada.
+
+> **INSERTAR AQUÍ:**
+> `fig_embeddings_rgb.png`
+
+---
+
+## Conclusiones del Objetivo 1
+
+* Los embeddings de AEF **sí capturan diferencias estructurales** entre agroecosistemas, áreas forestales/arbustivas y zonas urbanas.
+* Con solo unos pocos polígonos de entrenamiento (segmentados vía SAM), se logró una clasificación robusta.
+* El uso combinado de **SAM + QGIS + AEF embeddings + Random Forest** constituye un flujo de trabajo reproducible y eficiente para análisis de cobertura sin necesidad de deep learning complejo.
+* La validación cruzada mostró niveles consistentes de desempeño entre pliegues, indicando estabilidad del clasificador.
+
+---

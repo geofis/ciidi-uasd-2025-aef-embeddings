@@ -37,7 +37,7 @@ de tres casos de aplicación. En primer lugar, se evaluó su capacidad
 para discriminar coberturas en zonas agrícolas, forestales y urbanas. En
 segundo lugar, se probó su desempeño en la modelación de la distribución
 espacial de especies empleando registros de presencia y técnicas de
-aprendizaje supervisado. En tercer lugar, se analizó su aplicación en el
+aprendizaje automático. En tercer lugar, se analizó su aplicación en el
 diseño de muestreo estratificado, utilizando la similitud entre
 embeddings para optimizar la representatividad espacial y ambiental. Los
 resultados muestran que los embeddings satelitales capturan patrones
