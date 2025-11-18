@@ -22,7 +22,7 @@ class: center, middle, inverse, title-slide
 ### Universidad Autónoma de Santo Domingo (UASD)
 ]
 .date[
-### Actualizado: 2025-11-17
+### Actualizado: 2025-11-18
 ]
 
 ---
@@ -72,6 +72,25 @@ class: large
   margin: 10px 0;
   font-family: 'Courier New', monospace;
 }
+
+/* Diapositiva dedicada a una figura (sin casi márgenes) */
+.remark-slide-content.figure-slide {
+  padding: 0;                /* quita márgenes internos */
+}
+
+/* Imagen grande centrada que ocupa casi toda la diapo */
+.remark-slide-content.figure-slide img {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;       /* toda la figura visible; usa 'cover' si quieres recortar */
+}
+
+/* Ocultar número de diapositiva */
+.remark-slide-number {
+  display: none;
+}
 &lt;/style&gt;
 
 # .large[Objetivo]
@@ -112,14 +131,17 @@ class: large
 
 A continuación se muestra el resumen metodológico seguido para este objetivo, basado en tres componentes:
 
-1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno Jupyter adaptado de *Qiusheng Wu*.
+1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno adaptado de *Qiusheng Wu*, paquetes `samgeo`, `geemap`, en Google Colab.
 2. **Curación y unificación de clases** en QGIS.
 3. **Clasificación supervisada con embeddings AEF** mediante Random Forest y validación cruzada *k-folds* en Google Earth Engine.
 
 ---
-class: large
+class: large, center, middle, inverse
 
-## Metodología
+# Metodología
+
+---
+class: figure-slide, inverse, middle
 
 
 
@@ -127,6 +149,104 @@ class: large
 
 ---
 class: large
+
+## 1. Obtención de imágenes de alta resolución (ESRI World Imagery)
+
+Se descargó una imagen de referencia del área seleccionada empleando *ESRI World Imagery* con resolución aproximada de **5–10 m**, de manera que fuera coherente con la escala representada en los embeddings AEF.
+
+---
+class: large
+
+## 2. Segmentación automática con Segment Anything (SAM)
+
+La segmentación se realizó usando cuaderno Jupyter. El procesamiento incluyó:
+
+* Uso del modelo **ViT-H** (SAM), adecuado para imágenes de alta resolución pero útil también para imágenes de mediana resolución. Eficiente por su relación sensibilidad–costo computacional.
+* Aplicación de `sam.generate()` con `unique=True` para obtener **instancias diferenciadas**.
+* Ajuste de hiperparámetros (`points_per_side`, `pred_iou_thresh`, `crop_n_layers`, etc.) para aumentar la densidad de máscaras.
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="samgeo-vit-h-generate-mask-kwargs.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="salida-seriada.gif" width="100%" /&gt;
+
+---
+
+## 3. Limpieza y edición mínima en QGIS
+
+Las máscaras obtenidas se exportaron a GeoPackage, donde se realizó una edición mínima:
+
+* Corrección de pequeñas islas y polígonos erróneos.
+* Eliminación de duplicados.
+* Fusión de parches contiguos cuando correspondían a una misma cobertura.
+
+Se añadieron dos campos:
+
+* `class_id` (entero 1–8)
+* `class_label` (nombre de la clase)
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="mascaras_entrenamiento_qgis_color.jpg" width="100%" /&gt;
+
+---
+
+## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
+
+### Pasos principales
+
+* Se definió un **AOI** a partir del *buffer de 1 km* del socioecosistema.
+* Se extrajeron los embeddings mediante:
+
+
+
+* Se muestrearon los píxeles según los polígonos curados:
+
+
+
+* Se añadieron **5 folds** para validación cruzada:
+
+
+
+* Se entrenó un clasificador:
+
+
+
+---
+
+## 5. Resultados de la validación cruzada (5-fold CV)
+
+Los resultados fueron evaluados en términos de:
+
+* **Kappa de Cohen**
+* **Exactitud global (OA)**
+* **Matriz de confusión por pliegue**
+
+---
+class: figure-slide, inverse, middle
+
+&lt;div style="text-align:center;"&gt;
+  &lt;img src="metricas-k-fold-cv.jpg" style="max-width:100%; max-height:100vh;"&gt;
+&lt;/div&gt;
+
+---
+class: large, center, middle, inverse
+
+# Mapa de clasificación final
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="mapa_clasificacion.jpg" width="100%" /&gt;
+
+
+---
 
 
 

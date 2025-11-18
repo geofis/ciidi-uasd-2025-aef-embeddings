@@ -75,6 +75,25 @@ library(ggrepel)
   margin: 10px 0;
   font-family: 'Courier New', monospace;
 }
+
+/* Diapositiva dedicada a una figura (sin casi márgenes) */
+.remark-slide-content.figure-slide {
+  padding: 0;                /* quita márgenes internos */
+}
+
+/* Imagen grande centrada que ocupa casi toda la diapo */
+.remark-slide-content.figure-slide img {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;       /* toda la figura visible; usa 'cover' si quieres recortar */
+}
+
+/* Ocultar número de diapositiva */
+.remark-slide-number {
+  display: none;
+}
 ```
 
 # .large[Objetivo]
@@ -115,14 +134,17 @@ class: large
 
 A continuación se muestra el resumen metodológico seguido para este objetivo, basado en tres componentes:
 
-1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno Jupyter adaptado de *Qiusheng Wu*.
+1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno adaptado de *Qiusheng Wu*, paquetes `samgeo`, `geemap`, en Google Colab.
 2. **Curación y unificación de clases** en QGIS.
 3. **Clasificación supervisada con embeddings AEF** mediante Random Forest y validación cruzada *k-folds* en Google Earth Engine.
 
 ---
-class: large
+class: large, center, middle, inverse
 
-## Metodología
+# Metodología
+
+---
+class: figure-slide, inverse, middle
 
 ```{r, warning=F, message=F, echo=F}
 library(magick)
@@ -140,36 +162,34 @@ image_write(pdf_img, path = "graphical-methodology.jpg", format = "jpg")
 ---
 class: large
 
-```{r}
-knitr::knit_exit()
-```
-
-
 ## 1. Obtención de imágenes de alta resolución (ESRI World Imagery)
 
 Se descargó una imagen de referencia del área seleccionada empleando *ESRI World Imagery* con resolución aproximada de **5–10 m**, de manera que fuera coherente con la escala representada en los embeddings AEF.
 
-> **INSERTAR AQUÍ:**
-> `fig_imagen_esri_zoom14.png`
-> *(captura de la imagen que descargaste con el cuaderno SAM)*
-
 ---
+class: large
 
 ## 2. Segmentación automática con Segment Anything (SAM)
 
-La segmentación se realizó usando el cuaderno:
+La segmentación se realizó usando cuaderno Jupyter. El procesamiento incluyó:
 
-**automatic_mask_generator_usado_para_segmentar_imagen_sin_imagenes.ipynb**
-
-El procesamiento incluyó:
-
-* Uso del modelo **ViT-H** (SAM), adecuado para imágenes de ~10–20 m por su relación sensibilidad–costo computacional.
+* Uso del modelo **ViT-H** (SAM), adecuado para imágenes de alta resolución pero útil también para imágenes de mediana resolución. Eficiente por su relación sensibilidad–costo computacional.
 * Aplicación de `sam.generate()` con `unique=True` para obtener **instancias diferenciadas**.
 * Ajuste de hiperparámetros (`points_per_side`, `pred_iou_thresh`, `crop_n_layers`, etc.) para aumentar la densidad de máscaras.
 
-> **INSERTAR AQUÍ:**
-> `fig_sam_masks_raw.png`
-> *(captura de las máscaras sin editar, producto directo del SAM)*
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('samgeo-vit-h-generate-mask-kwargs.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('salida-seriada.gif')
+```
 
 ---
 
@@ -186,30 +206,29 @@ Se añadieron dos campos:
 * `class_id` (entero 1–8)
 * `class_label` (nombre de la clase)
 
-> **INSERTAR AQUÍ:**
-> `fig_masks_editadas_qgis.png`
-> *(captura del GPKG final con las clases)*
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('mascaras_entrenamiento_qgis_color.jpg')
+```
 
 ---
 
 ## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
-
-La clasificación se ejecutó en el cuaderno:
-
-**aef_classificacion.ipynb.ipynb**
 
 ### Pasos principales
 
 * Se definió un **AOI** a partir del *buffer de 1 km* del socioecosistema.
 * Se extrajeron los embeddings mediante:
 
-```python
+```{python, eval=F}
 emb_image = ee.Image("GOOGLE/AE/IMG_V1").clip(aoi)
 ```
 
 * Se muestrearon los píxeles según los polígonos curados:
 
-```python
+```{python, eval=F}
 sample = emb_image.sampleRegions(
     collection=fc,
     properties=["class_id"],
@@ -220,13 +239,13 @@ sample = emb_image.sampleRegions(
 
 * Se añadieron **5 folds** para validación cruzada:
 
-```python
+```{python, eval=F}
 sample = sample.randomColumn("rand").divide(k).int()
 ```
 
 * Se entrenó un clasificador:
 
-```python
+```{python, eval=F}
 classifier = ee.Classifier.smileRandomForest(
     numberOfTrees=100,
     minLeafPopulation=5
@@ -239,38 +258,36 @@ classifier = ee.Classifier.smileRandomForest(
 
 Los resultados fueron evaluados en términos de:
 
-* **Exactitud global (OA)**
 * **Kappa de Cohen**
+* **Exactitud global (OA)**
 * **Matriz de confusión por pliegue**
 
-> **INSERTAR AQUÍ:**
-> `tabla_resultados_cv.png`
-> *(captura de tus resultados generados en el cuaderno)*
+---
+class: figure-slide, inverse, middle
+
+<div style="text-align:center;">
+  <img src="metricas-k-fold-cv.jpg" style="max-width:100%; max-height:100vh;">
+</div>
 
 ---
+class: large, center, middle, inverse
 
-## 6. Mapa de clasificación final
+# Mapa de clasificación final
 
-El clasificador entrenado se aplicó al AOI completo para generar el mapa final.
+---
+class: figure-slide, inverse, middle
 
-Visualización (paleta sugerida):
-
-```python
-vis_params = {
-    "min": 1, "max": 8,
-    "palette": [
-        "#ffffb2", "#238b45", "#41b6c4",
-        "#006d2c", "#2171b5", "#dd3497",
-        "#bdbdbd", "#8c6d31"
-    ]
-}
+```{r}
+knitr::include_graphics('mapa_clasificacion.jpg')
 ```
 
-> **INSERTAR AQUÍ:**
-> `fig_clasificacion_final.png`
-> *(mapa de clasificación completo en geemap)*
 
 ---
+
+```{r}
+knitr::knit_exit()
+```
+
 
 ## 7. Visualización directa de embeddings (RGB artificial)
 
