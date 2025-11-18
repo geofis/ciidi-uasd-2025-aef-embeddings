@@ -76,27 +76,75 @@ library(ggrepel)
   font-family: 'Courier New', monospace;
 }
 
-/* Diapositiva dedicada a una figura (sin casi márgenes) */
-.remark-slide-content.figure-slide {
-  padding: 0;                /* quita márgenes internos */
-}
-
-/* Imagen grande centrada que ocupa casi toda la diapo */
-.remark-slide-content.figure-slide img {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;       /* toda la figura visible; usa 'cover' si quieres recortar */
-}
-
 /* Ocultar número de diapositiva */
 .remark-slide-number {
   display: none;
 }
+
+/* Diapositiva dedicada a una figura (sin márgenes internos) */
+.remark-slide-content.figure-slide {
+  padding: 0;
+}
+
+/* Quitar margen del párrafo que envuelve la imagen */
+.remark-slide-content.figure-slide p {
+  margin: 0;
+}
+
+/* Imagen centrada */
+.remark-slide-content.figure-slide img {
+  display: block;
+  margin: 0 auto;
+}
 ```
 
-# .large[Objetivo]
+# ¿Qué son los embeddings de Google AlphaEarth Foundations (AEF)?
+
+- Los embeddings de **Google AlphaEarth Foundations (AEF)** condensan información espacio–temporal derivada de series multiespectrales completas (p.ej., Sentinel, Landsat, mapas de cobertura, LiDAR, bioclima).
+
+- Cada píxel es representado por un **vector numérico de alta dimensión** que captura características espectrales, temporales y espaciales.
+
+- Su principal fortaleza es que **permiten realizar tareas de clasificación con muy pocos datos de entrenamiento**, evitando el entrenamiento de modelos de deep learning desde cero.
+
+---
+class: figure-slide, center, inverse, middle
+
+```{r, out.width='57%'}
+knitr::include_graphics('preprint-capture.jpg')
+```
+
+---
+class: figure-slide, center, inverse, middle
+
+```{r, out.width='57%'}
+knitr::include_graphics('preprint-capture-hl.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('aef-animation.gif')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='65%'}
+knitr::include_graphics('paradigma-embedding-fields.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='88%'}
+knitr::include_graphics('ejemplo_embeddings.jpg')
+```
+
+---
+class: large
+
+# Objetivos
 
 - Objetivo general: evaluar la utilidad práctica de los embeddings de AlphaEarth Foundations para apoyar diferentes procesos de análisis espacial en contextos ecológicos y territoriales de la República Dominicana. 
 
@@ -106,19 +154,16 @@ library(ggrepel)
   - Analizar su aplicación en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
 
 ---
-class: large
+class: large, center, middle, inverse
 
-## Objetivo 1  
+# Objetivo 1  
 
-- Evaluar la capacidad de los embeddings satelitales de Google AEF para discriminar coberturas agrícolas, forestales y urbanas
+Evaluar la capacidad de los embeddings satelitales de Google AEF para discriminar coberturas agrícolas, forestales y urbanas
 
 ---
 class: large
 
-## Contexto
-
-Los embeddings satelitales de *Google AlphaEarth Foundations (AEF)* condensan información espacio–temporal derivada de series multiespectrales completas (p.ej., Sentinel-2).  
-Su principal fortaleza es que **permiten realizar tareas de clasificación con muy pocos datos de entrenamiento**, evitando el entrenamiento de modelos de deep learning desde cero.
+# Contexto
 
 Para este objetivo se seleccionó un área con presencia simultánea de:
 
@@ -130,13 +175,14 @@ Para este objetivo se seleccionó un área con presencia simultánea de:
 ---
 class: large
 
-## Flujo metodológico general
+# Flujo metodológico general
 
 A continuación se muestra el resumen metodológico seguido para este objetivo, basado en tres componentes:
 
 1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno adaptado de *Qiusheng Wu*, paquetes `samgeo`, `geemap`, en Google Colab.
 2. **Curación y unificación de clases** en QGIS.
 3. **Clasificación supervisada con embeddings AEF** mediante Random Forest y validación cruzada *k-folds* en Google Earth Engine.
+
 
 ---
 class: large, center, middle, inverse
@@ -158,6 +204,13 @@ image_write(pdf_img, path = "graphical-methodology.jpg", format = "jpg")
 ```
 
 ![](graphical-methodology.jpg)
+
+---
+class: figure-slide, center, inverse, middle
+
+```{r, out.width='50%'}
+knitr::include_graphics('capturas_4.jpg')
+```
 
 ---
 class: large
@@ -214,6 +267,7 @@ knitr::include_graphics('mascaras_entrenamiento_qgis_color.jpg')
 ```
 
 ---
+class: large
 
 ## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
 
@@ -222,13 +276,13 @@ knitr::include_graphics('mascaras_entrenamiento_qgis_color.jpg')
 * Se definió un **AOI** a partir del *buffer de 1 km* del socioecosistema.
 * Se extrajeron los embeddings mediante:
 
-```{python, eval=F}
+```{python, echo=T, eval=F}
 emb_image = ee.Image("GOOGLE/AE/IMG_V1").clip(aoi)
 ```
 
 * Se muestrearon los píxeles según los polígonos curados:
 
-```{python, eval=F}
+```{python, echo=T, eval=F}
 sample = emb_image.sampleRegions(
     collection=fc,
     properties=["class_id"],
@@ -237,15 +291,22 @@ sample = emb_image.sampleRegions(
 )
 ```
 
+---
+class: large
+
+## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
+
+### Pasos principales
+
 * Se añadieron **5 folds** para validación cruzada:
 
-```{python, eval=F}
+```{python, echo=T, eval=F}
 sample = sample.randomColumn("rand").divide(k).int()
 ```
 
 * Se entrenó un clasificador:
 
-```{python, eval=F}
+```{python, echo=T, eval=F}
 classifier = ee.Classifier.smileRandomForest(
     numberOfTrees=100,
     minLeafPopulation=5
@@ -253,6 +314,7 @@ classifier = ee.Classifier.smileRandomForest(
 ```
 
 ---
+class: large
 
 ## 5. Resultados de la validación cruzada (5-fold CV)
 
@@ -265,14 +327,14 @@ Los resultados fueron evaluados en términos de:
 ---
 class: figure-slide, inverse, middle
 
-<div style="text-align:center;">
-  <img src="metricas-k-fold-cv.jpg" style="max-width:100%; max-height:100vh;">
-</div>
+```{r, out.width='97%'}
+knitr::include_graphics('metricas-k-fold-cv.jpg')
+```
 
 ---
 class: large, center, middle, inverse
 
-# Mapa de clasificación final
+# Mapa de clasificación
 
 ---
 class: figure-slide, inverse, middle
@@ -280,30 +342,6 @@ class: figure-slide, inverse, middle
 ```{r}
 knitr::include_graphics('mapa_clasificacion.jpg')
 ```
-
-
----
-
-```{r}
-knitr::knit_exit()
-```
-
-
-## 7. Visualización directa de embeddings (RGB artificial)
-
-También se generó una visualización directa de tres dimensiones de embeddings:
-
-```python
-emb_vis_params = {
-    "bands": ["A00", "A21", "A42"],
-    "min": -2, "max": 2
-}
-```
-
-Esta imagen permite apreciar cómo los embeddings representan patrones espacio–temporales de cobertura, aun antes de la clasificación supervisada.
-
-> **INSERTAR AQUÍ:**
-> `fig_embeddings_rgb.png`
 
 ---
 
@@ -315,3 +353,100 @@ Esta imagen permite apreciar cómo los embeddings representan patrones espacio�
 * La validación cruzada mostró niveles consistentes de desempeño entre pliegues, indicando estabilidad del clasificador.
 
 ---
+class: large, center, middle, inverse
+
+# Objetivo 2
+
+Probar desempeño de embeddings de AEF en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
+
+---
+class: large, center, middle, inverse
+
+# Objetivo 3
+
+Analizar la aplicación de embeddings de AEF en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-lejos-0-google.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-lejos-1-embeddings-2022.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-lejos-2-embeddings-2023.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-lejos-3-similaridad-2022-2023.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-lejos-0-google.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-cerca-0-google-puntos-jicoteas.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-cerca-1-drone.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-cerca-2-embeddings-puntos-jicoteas.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('calculos-rstudio.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-cerca-3-clasificacion-similaridad-puntos-jicoteas.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('serie-cerca-4-puntos-candidatos.jpg')
+```
+
+---
+
+
+
+```{r}
+knitr::knit_exit()
+```

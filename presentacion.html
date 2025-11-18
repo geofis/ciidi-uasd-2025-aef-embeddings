@@ -73,27 +73,65 @@ class: large
   font-family: 'Courier New', monospace;
 }
 
-/* Diapositiva dedicada a una figura (sin casi márgenes) */
-.remark-slide-content.figure-slide {
-  padding: 0;                /* quita márgenes internos */
-}
-
-/* Imagen grande centrada que ocupa casi toda la diapo */
-.remark-slide-content.figure-slide img {
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;       /* toda la figura visible; usa 'cover' si quieres recortar */
-}
-
 /* Ocultar número de diapositiva */
 .remark-slide-number {
   display: none;
 }
+
+/* Diapositiva dedicada a una figura (sin márgenes internos) */
+.remark-slide-content.figure-slide {
+  padding: 0;
+}
+
+/* Quitar margen del párrafo que envuelve la imagen */
+.remark-slide-content.figure-slide p {
+  margin: 0;
+}
+
+/* Imagen centrada */
+.remark-slide-content.figure-slide img {
+  display: block;
+  margin: 0 auto;
+}
 &lt;/style&gt;
 
-# .large[Objetivo]
+# ¿Qué son los embeddings de Google AlphaEarth Foundations (AEF)?
+
+- Los embeddings de **Google AlphaEarth Foundations (AEF)** condensan información espacio–temporal derivada de series multiespectrales completas (p.ej., Sentinel, Landsat, mapas de cobertura, LiDAR, bioclima).
+
+- Cada píxel es representado por un **vector numérico de alta dimensión** que captura características espectrales, temporales y espaciales.
+
+- Su principal fortaleza es que **permiten realizar tareas de clasificación con muy pocos datos de entrenamiento**, evitando el entrenamiento de modelos de deep learning desde cero.
+
+---
+class: figure-slide, center, inverse, middle
+
+&lt;img src="preprint-capture.jpg" width="57%" /&gt;
+
+---
+class: figure-slide, center, inverse, middle
+
+&lt;img src="preprint-capture-hl.jpg" width="57%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="aef-animation.gif" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="paradigma-embedding-fields.jpg" width="65%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="ejemplo_embeddings.jpg" width="88%" /&gt;
+
+---
+class: large
+
+# Objetivos
 
 - Objetivo general: evaluar la utilidad práctica de los embeddings de AlphaEarth Foundations para apoyar diferentes procesos de análisis espacial en contextos ecológicos y territoriales de la República Dominicana. 
 
@@ -103,19 +141,16 @@ class: large
   - Analizar su aplicación en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
 
 ---
-class: large
+class: large, center, middle, inverse
 
-## Objetivo 1  
+# Objetivo 1  
 
-- Evaluar la capacidad de los embeddings satelitales de Google AEF para discriminar coberturas agrícolas, forestales y urbanas
+Evaluar la capacidad de los embeddings satelitales de Google AEF para discriminar coberturas agrícolas, forestales y urbanas
 
 ---
 class: large
 
-## Contexto
-
-Los embeddings satelitales de *Google AlphaEarth Foundations (AEF)* condensan información espacio–temporal derivada de series multiespectrales completas (p.ej., Sentinel-2).  
-Su principal fortaleza es que **permiten realizar tareas de clasificación con muy pocos datos de entrenamiento**, evitando el entrenamiento de modelos de deep learning desde cero.
+# Contexto
 
 Para este objetivo se seleccionó un área con presencia simultánea de:
 
@@ -127,13 +162,14 @@ Para este objetivo se seleccionó un área con presencia simultánea de:
 ---
 class: large
 
-## Flujo metodológico general
+# Flujo metodológico general
 
 A continuación se muestra el resumen metodológico seguido para este objetivo, basado en tres componentes:
 
 1. **Obtención de las máscaras de entrenamiento** mediante SAM (Segment Anything) usando el cuaderno adaptado de *Qiusheng Wu*, paquetes `samgeo`, `geemap`, en Google Colab.
 2. **Curación y unificación de clases** en QGIS.
 3. **Clasificación supervisada con embeddings AEF** mediante Random Forest y validación cruzada *k-folds* en Google Earth Engine.
+
 
 ---
 class: large, center, middle, inverse
@@ -146,6 +182,11 @@ class: figure-slide, inverse, middle
 
 
 ![](graphical-methodology.jpg)
+
+---
+class: figure-slide, center, inverse, middle
+
+&lt;img src="capturas_4.jpg" width="50%" /&gt;
 
 ---
 class: large
@@ -196,6 +237,7 @@ class: figure-slide, inverse, middle
 &lt;img src="mascaras_entrenamiento_qgis_color.jpg" width="100%" /&gt;
 
 ---
+class: large
 
 ## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
 
@@ -205,20 +247,48 @@ class: figure-slide, inverse, middle
 * Se extrajeron los embeddings mediante:
 
 
+``` python
+emb_image = ee.Image("GOOGLE/AE/IMG_V1").clip(aoi)
+```
 
 * Se muestrearon los píxeles según los polígonos curados:
 
 
+``` python
+sample = emb_image.sampleRegions(
+    collection=fc,
+    properties=["class_id"],
+    scale=40,   # ajustado para evitar EEException: memory exceeded
+    geometries=False
+)
+```
+
+---
+class: large
+
+## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
+
+### Pasos principales
 
 * Se añadieron **5 folds** para validación cruzada:
 
 
+``` python
+sample = sample.randomColumn("rand").divide(k).int()
+```
 
 * Se entrenó un clasificador:
 
 
+``` python
+classifier = ee.Classifier.smileRandomForest(
+    numberOfTrees=100,
+    minLeafPopulation=5
+)
+```
 
 ---
+class: large
 
 ## 5. Resultados de la validación cruzada (5-fold CV)
 
@@ -231,22 +301,98 @@ Los resultados fueron evaluados en términos de:
 ---
 class: figure-slide, inverse, middle
 
-&lt;div style="text-align:center;"&gt;
-  &lt;img src="metricas-k-fold-cv.jpg" style="max-width:100%; max-height:100vh;"&gt;
-&lt;/div&gt;
+&lt;img src="metricas-k-fold-cv.jpg" width="97%" /&gt;
 
 ---
 class: large, center, middle, inverse
 
-# Mapa de clasificación final
+# Mapa de clasificación
 
 ---
 class: figure-slide, inverse, middle
 
 &lt;img src="mapa_clasificacion.jpg" width="100%" /&gt;
 
+---
+
+## Conclusiones del Objetivo 1
+
+* Los embeddings de AEF **sí capturan diferencias estructurales** entre agroecosistemas, áreas forestales/arbustivas y zonas urbanas.
+* Con solo unos pocos polígonos de entrenamiento (segmentados vía SAM), se logró una clasificación robusta.
+* El uso combinado de **SAM + QGIS + AEF embeddings + Random Forest** constituye un flujo de trabajo reproducible y eficiente para análisis de cobertura sin necesidad de deep learning complejo.
+* La validación cruzada mostró niveles consistentes de desempeño entre pliegues, indicando estabilidad del clasificador.
 
 ---
+class: large, center, middle, inverse
+
+# Objetivo 2
+
+Probar desempeño de embeddings de AEF en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
+
+---
+class: large, center, middle, inverse
+
+# Objetivo 3
+
+Analizar la aplicación de embeddings de AEF en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-lejos-0-google.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-lejos-1-embeddings-2022.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-lejos-2-embeddings-2023.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-lejos-3-similaridad-2022-2023.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-lejos-0-google.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-cerca-0-google-puntos-jicoteas.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-cerca-1-drone.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-cerca-2-embeddings-puntos-jicoteas.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="calculos-rstudio.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-cerca-3-clasificacion-similaridad-puntos-jicoteas.jpg" width="100%" /&gt;
+
+---
+class: figure-slide, inverse, middle
+
+&lt;img src="serie-cerca-4-puntos-candidatos.jpg" width="100%" /&gt;
+
+---
+
 
 
 
