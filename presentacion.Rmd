@@ -1,6 +1,6 @@
 ---
 title: "Aplicaciones de los embeddings satelitales de Google AlphaEarth Foundations en el análisis geoespacial: clasificación de uso del suelo, modelado de distribución de especies y diseño de muestreo"
-subtitle: ""
+subtitle: "<small>https://geofis.github.io/ciidi-uasd-2025-aef-embeddings/presentacion.html</small>"
 author: "José Ramón Martínez Batlle"
 institute: "Universidad Autónoma de Santo Domingo (UASD)"
 date: "Actualizado: `r Sys.Date()`"
@@ -8,10 +8,25 @@ output:
   xaringan::moon_reader:
     lib_dir: libs
     mathjax: "default"
+    seal: false
     nature:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+---
+class: center, middle, title-slide, inverse
+
+IV Congreso Internacional de Investigación, Desarrollo e Innovación (I+D+I) <br> y la XXIV Jornada de Investigación Científica (2025)
+
+## Aplicaciones de los embeddings satelitales de Google AlphaEarth Foundations en el análisis geoespacial: clasificación de uso del suelo, modelado de distribución de especies y diseño de muestreo
+
+<small>https://geofis.github.io/ciidi-uasd-2025-aef-embeddings/presentacion.html</small>  
+
+**José Ramón Martínez Batlle**  
+Universidad Autónoma de Santo Domingo (UASD)  
+
+![](qr-presentacion.png)
+
 ---
 class: large
 
@@ -163,39 +178,44 @@ Probar desempeño de embeddings de AEF en la modelación de la **distribución e
 Colaboración para mis estudiantes del semestre 2023-02, asignatura biogeografía: Adrián Montás, Ángel González, Arisleydi De la Cruz, Bryan Ramos, Claribel Ramírez, Manuel Reyes, Ramona Muñoz, Saderis Carmona, Yenny Santana
 
 ---
-class: figure-slide, inverse, middle
+class: figure-slide, inverse, middle, center
 
-```{r, out.width='85%'}
+```{r, out.width='75%'}
 knitr::include_graphics('informes_hormigas_uasd_00.jpg')
 ```
+Autor: Adrían Diplán.
 
 ---
-class: figure-slide, inverse, middle
-
-```{r}
-knitr::include_graphics('informes_hormigas_uasd_01.jpg')
-```
-
----
-class: figure-slide, inverse, middle
-
-```{r}
-knitr::include_graphics('informes_hormigas_uasd_02.jpg')
-```
-
----
-class: figure-slide, inverse, middle
-
-```{r, out.width='90%'}
-knitr::include_graphics('informes_hormigas_uasd_03.jpg')
-```
-
----
-class: figure-slide, inverse, middle
+class: figure-slide, inverse, middle, center
 
 ```{r}
 knitr::include_graphics('informes_hormigas_uasd_04.jpg')
 ```
+Autor: Adrían Diplán.
+
+---
+class: figure-slide, inverse, middle, center
+
+```{r}
+knitr::include_graphics('informes_hormigas_uasd_01.jpg')
+```
+Autor: Adrían Diplán.
+
+---
+class: figure-slide, inverse, middle, center
+
+```{r, out.width='90%'}
+knitr::include_graphics('informes_hormigas_uasd_02.jpg')
+```
+Autor: Adrían Diplán.
+
+---
+class: figure-slide, inverse, middle, center
+
+```{r, out.width='80%'}
+knitr::include_graphics('informes_hormigas_uasd_03.jpg')
+```
+Autor: Adrían Diplán.
 
 ---
 class: figure-slide, inverse, middle
@@ -214,21 +234,21 @@ knitr::include_graphics('registros_pa_brachymyrmex_uasd.jpg')
 ---
 class: figure-slide, inverse, middle
 
-```{r, out.width='80%'}
+```{r, out.width='70%'}
 knitr::include_graphics('probabilidad_brachymyrmex_uasd.jpg')
 ```
 
 ---
 class: figure-slide, inverse, middle
 
-```{r, out.width='80%'}
+```{r, out.width='70%'}
 knitr::include_graphics('probabilidad_0p5_umbral_brachymyrmex_uasd.jpg')
 ```
 
 ---
 class: figure-slide, inverse, middle
 
-```{r, out.width='60%'}
+```{r, out.width='50%'}
 knitr::include_graphics('auc_brachymyrmex_uasd.jpg')
 ```
 
@@ -244,8 +264,10 @@ class: large
 
 # Conclusiones del Objetivo 1
 
-- **Los embeddings AEF reflejan gradientes ambientales finos** dentro del campus, capturando variación espacial relevante.
-- **La extracción de valores ambientales por hexágono H3 fue exitosa**, generando una base homogénea para integrar las presencias.
+- **Los embeddings AEF reflejan gradientes ambientales finos** dentro del campus, capturando variación espacial relevante, **incluso sin usar datos de cobertura preexistentes y *con muestra pequeña***.
+
+- **La extracción de patrones ambientales por hexágono H3 fue exitosa**, generando una base homogénea para integrar las presencias.
+
 - **Los modelos exploratorios muestran potencial predictivo** de los embeddings como variables para la distribución
 
 ---
