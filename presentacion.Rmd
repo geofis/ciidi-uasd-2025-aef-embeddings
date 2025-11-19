@@ -36,7 +36,7 @@ library(ggrepel)
 
 ```{css, echo=FALSE}
 .title-slide {
-  background-image: url('fondo.jpg');
+  <!-- background-image: url('fondo.jpg'); -->
   background-size: cover;
   background-position: center;
 }
