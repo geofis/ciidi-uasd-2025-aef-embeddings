@@ -163,10 +163,90 @@ Probar desempeño de embeddings de AEF en la modelación de la **distribución e
 Colaboración para mis estudiantes del semestre 2023-02, asignatura biogeografía: Adrián Montás, Ángel González, Arisleydi De la Cruz, Bryan Ramos, Claribel Ramírez, Manuel Reyes, Ramona Muñoz, Saderis Carmona, Yenny Santana
 
 ---
+class: figure-slide, inverse, middle
+
+```{r, out.width='85%'}
+knitr::include_graphics('informes_hormigas_uasd_00.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('informes_hormigas_uasd_01.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('informes_hormigas_uasd_02.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='90%'}
+knitr::include_graphics('informes_hormigas_uasd_03.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('informes_hormigas_uasd_04.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r}
+knitr::include_graphics('embeddings_uasd.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='95%'}
+knitr::include_graphics('registros_pa_brachymyrmex_uasd.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='80%'}
+knitr::include_graphics('probabilidad_brachymyrmex_uasd.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='80%'}
+knitr::include_graphics('probabilidad_0p5_umbral_brachymyrmex_uasd.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='60%'}
+knitr::include_graphics('auc_brachymyrmex_uasd.jpg')
+```
+
+---
+class: figure-slide, inverse, middle
+
+```{r, out.width='60%'}
+knitr::include_graphics('boyce_brahymyrmex_uasd.jpg')
+```
+
+---
 class: large
 
 # Conclusiones del Objetivo 1
 
+- **Los embeddings AEF reflejan gradientes ambientales finos** dentro del campus, capturando variación espacial relevante.
+- **La extracción de valores ambientales por hexágono H3 fue exitosa**, generando una base homogénea para integrar las presencias.
+- **Los modelos exploratorios muestran potencial predictivo** de los embeddings como variables para la distribución
 
 ---
 class: large, center, middle, inverse
