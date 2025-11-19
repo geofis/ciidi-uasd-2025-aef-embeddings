@@ -6,7 +6,8 @@ institute: "Universidad Autónoma de Santo Domingo (UASD)"
 date: "Actualizado: `r Sys.Date()`"
 output:
   xaringan::moon_reader:
-    lib_dir: libs
+    self_contained: true
+    lib_dir: null
     mathjax: "default"
     seal: false
     nature:
@@ -176,6 +177,13 @@ class: large, center, middle, inverse
 Probar desempeño de embeddings de AEF en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
 
 Colaboración para mis estudiantes del semestre 2023-02, asignatura biogeografía: Adrián Montás, Ángel González, Arisleydi De la Cruz, Bryan Ramos, Claribel Ramírez, Manuel Reyes, Ramona Muñoz, Saderis Carmona, Yenny Santana
+
+---
+class: figure-slide, inverse, middle, center
+
+```{r, out.width='75%'}
+knitr::include_graphics('campus-uasd-h3.jpg')
+```
 
 ---
 class: figure-slide, inverse, middle, center
