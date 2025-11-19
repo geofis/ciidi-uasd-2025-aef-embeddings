@@ -146,19 +146,36 @@ class: large
 
 # Objetivos
 
-- Objetivo general: evaluar la utilidad práctica de los embeddings de AlphaEarth Foundations para apoyar diferentes procesos de análisis espacial en contextos ecológicos y territoriales de la República Dominicana. 
+- Objetivo general: evaluar la utilidad práctica de los **embeddings de AlphaEarth Foundations** para apoyar diferentes procesos de análisis espacial en contextos ecológicos y territoriales de la República Dominicana. 
 
 - Objetivos específicos:
-  - Evaluar la capacidad para **discriminar coberturas** en zonas agrícolas, forestales y urbanas. 
   - Probar su desempeño en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
+  - Evaluar la capacidad para **discriminar coberturas** en zonas agrícolas, forestales y urbanas.
   - Analizar su aplicación en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
 
 ---
 class: large, center, middle, inverse
 
-# Objetivo 1  
+# Objetivo 1
+
+Probar desempeño de embeddings de AEF en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
+
+Colaboración para mis estudiantes del semestre 2023-02, asignatura biogeografía: Adrián Montás, Ángel González, Arisleydi De la Cruz, Bryan Ramos, Claribel Ramírez, Manuel Reyes, Ramona Muñoz, Saderis Carmona, Yenny Santana
+
+---
+class: large
+
+# Conclusiones del Objetivo 1
+
+
+---
+class: large, center, middle, inverse
+
+# Objetivo 2
 
 Evaluar la capacidad de los embeddings satelitales de Google AEF para discriminar coberturas agrícolas, forestales y urbanas
+
+Colaboración para Kénnida Polanco.
 
 ---
 class: large
@@ -294,10 +311,6 @@ sample = emb_image.sampleRegions(
 ---
 class: large
 
-## 4. Clasificación supervisada con embeddings AEF en Google Earth Engine
-
-### Pasos principales
-
 * Se añadieron **5 folds** para validación cruzada:
 
 ```{python, echo=T, eval=F}
@@ -344,8 +357,9 @@ knitr::include_graphics('mapa_clasificacion.jpg')
 ```
 
 ---
+class: large
 
-## Conclusiones del Objetivo 1
+# Conclusiones del Objetivo 2
 
 * Los embeddings de AEF **sí capturan diferencias estructurales** entre agroecosistemas, áreas forestales/arbustivas y zonas urbanas.
 * Con solo unos pocos polígonos de entrenamiento (segmentados vía SAM), se logró una clasificación robusta.
@@ -355,16 +369,30 @@ knitr::include_graphics('mapa_clasificacion.jpg')
 ---
 class: large, center, middle, inverse
 
-# Objetivo 2
-
-Probar desempeño de embeddings de AEF en la modelación de la **distribución espacial de especies** empleando registros de presencia y técnicas de aprendizaje supervisado.
-
----
-class: large, center, middle, inverse
-
 # Objetivo 3
 
 Analizar la aplicación de embeddings de AEF en el **diseño de muestreo estratificado**, utilizando la similitud entre embeddings para optimizar la representatividad espacial y ambiental
+
+Colaboración para María Fernanda Rodríguez y Wellin Brito.
+
+---
+class: figure-slide, inverse, middle
+
+```{r, warning=F, message=F, echo=F}
+library(magick)
+
+# Leer el PDF (puedes indicar página con [1], [2], etc.)
+pdf_img <- image_read_pdf("graphical-methodology-don-gregorio.pdf",
+                          density = 300)  # density mejora resolución
+
+# Guardar como JPG
+image_write(pdf_img, path = "graphical-methodology-don-gregorio.jpg", format = "jpg")
+```
+
+
+```{r, out.width='95%'}
+knitr::include_graphics('graphical-methodology-don-gregorio.jpg')
+```
 
 ---
 class: figure-slide, inverse, middle
@@ -444,9 +472,37 @@ knitr::include_graphics('serie-cerca-4-puntos-candidatos.jpg')
 ```
 
 ---
+class: figure-slide, inverse, middle
 
-
-
-```{r}
-knitr::knit_exit()
+```{r, out.width='100%'}
+knitr::include_graphics('puntos-muestreo-solenodon.gif')
 ```
+
+---
+class: large
+
+# Conclusiones del Objetivo 3
+
+- **Los embeddings AEF permiten definir estratos ambientales** sin mapas previos, usando solo similitud por coseno.
+
+- **El umbral aprendido localmente genera estratos estables**, coherentes con los hábitats asociados a los puntos de terreno.
+
+- **El muestreo estratificado resultante es más representativo**, asignando puntos según la estructura ambiental real del área.
+
+---
+class: large, inverse, center, middle
+
+# Gracias por su atención
+
+<section style="font-size: 36px; text-align: center;">
+
+<br>
+
+<img src="email-icon.png" style="display: inline-block; vertical-align: middle;" width="48"/> jmartinez19@uasd.edu.do
+
+<br>
+
+<img src="gh-icon.png" style="display: inline-block; vertical-align: middle;" width="48"/> geofis
+
+</section>
+
